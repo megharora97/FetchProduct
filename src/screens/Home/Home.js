@@ -4,7 +4,7 @@ import { Text, Icon } from 'react-native-elements'
 import Header from '../../Component/Header';
 import styles from '../../Component/Styles';
 import { getProductApi } from '../../Services/Api';
-
+import AsyncStorage from '@react-native-community/async-storage'
 const { height, width } = Dimensions.get('window');
 
 export default class Home extends React.PureComponent {
@@ -17,7 +17,7 @@ export default class Home extends React.PureComponent {
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         this.ProductApi()
     }
 
@@ -43,20 +43,20 @@ export default class Home extends React.PureComponent {
         const { ProductDATA } = this.state;
         if (SearchValue) {
             let newData = []
-            newData = ProductDATA.filter(item => {
-                const itemData = `${item.title}`
-                const textData = SearchValue;
-                const matching = itemData.match(textData);
-                console.log("Matching", matching);
-                this.setState({ loading: true });
-                return matching;
-            });
-            this.setState({ ProductDATA: newData, loading: false });
-            console.log("newData:", newData);
+            if (ProductDATA && ProductDATA != '') {
+                newData = ProductDATA.filter(item => {
+                    const itemData = `${item.title}`.toLowerCase()
+                    const textData = SearchValue;
+                    const matching = itemData.match(`${textData}`.toLowerCase());
+                    console.log("Matching", matching);
+                    return matching;
+                });
+                console.log("newData", newData);
+                return newData
+            }
         }
-        else {
-            alert('Search the Title Name')
-        }
+        return [...ProductDATA]
+       
     }
 
     renderItem = ({ item, index }) => {
@@ -97,10 +97,12 @@ export default class Home extends React.PureComponent {
                 <Header
                     navigation={this.props.navigation}
                     ChangeValue={SearchValue}
-                    onChangeValue={(text) => this.setState({ SearchValue: text })}
+                    onChangeValue={(text) => {
+                        this.setState({ SearchValue: text })
+                    }}
                     Refs={input => { this.textInput = input }}
                     ClearSearch={() => { this.setState({ SearchValue: '', }) }}
-                    OnSubmit={() => { this.SearchDataProduct(SearchValue) }}
+                    OnSubmit={() => {  }}
                 />
                 {loading ?
                     <View style={{ justifyContent: 'center', alignSelf: 'center', flex: 1 }}>
@@ -114,7 +116,7 @@ export default class Home extends React.PureComponent {
                                 <FlatList
                                     showsVerticalScrollIndicator={false}
                                     showsHorizontalScrollIndicator={false}
-                                    data={ProductDATA}
+                                    data={this.SearchDataProduct(SearchValue)}
                                     initialNumToRender={4}
                                     extraData={this.state}
                                     keyExtractor={(item, index) => String(index)}
