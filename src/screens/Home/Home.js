@@ -32,8 +32,8 @@ export default class Home extends React.PureComponent {
                 let Data1 = Object.values(Productdata)
                 console.log('Data1', Data1);
                 Data1.sort((a, b)=>{
-                   if(parseInt(a.popularity) < parseInt(b.popularity) ) {return -1}
-                   if(parseInt(a.popularity) > parseInt(b.popularity) ) {return 1}
+                   if(parseInt(a.popularity) < parseInt(b.popularity) ) {return 1}
+                   if(parseInt(a.popularity) > parseInt(b.popularity) ) {return -1}
                    if(parseInt(a.popularity) == parseInt(b.popularity) ) {return 0}
                 })
                 this.setState({ ProductDATA: Data1 })
